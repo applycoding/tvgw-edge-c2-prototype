@@ -1,0 +1,5 @@
+# HELP tvgw_p0_within_deadline P0 within-deadline delivery ratio (cell means)
+# TYPE tvgw_p0_within_deadline summary
+tvgw_p0_within_deadline_sum{mode="lab"} 210.62608706092394
+tvgw_p0_within_deadline_count{mode="lab"} 300
+tvgw_p0_within_deadline{mode="lab",quantile="0.5"} 0.7020869568697464

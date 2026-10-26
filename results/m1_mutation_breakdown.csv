@@ -1,0 +1,13 @@
+mutation_class,count,xsd_only_rejected_pct,combined_rejected_pct
+missing_name,100,0.0,100.0
+missing_time,100,0.0,100.0
+missing_location,100,0.0,100.0
+lat_non_numeric,100,100.0,100.0
+lat_out_of_range,100,100.0,100.0
+lon_out_of_range,100,100.0,100.0
+bad_datetime,100,100.0,100.0
+wrong_namespace,100,100.0,100.0
+unknown_child,100,100.0,100.0
+wrong_element_order,100,100.0,100.0
+truncated_xml,100,100.0,100.0
+empty_document,100,100.0,100.0

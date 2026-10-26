@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Detection",
+  "type": "object",
+  "required": ["detection_id", "timestamp_utc", "latitude_deg", "longitude_deg"],
+  "properties": {
+    "detection_id": { "type": "string" },
+    "timestamp_utc": { "type": "string" },
+    "latitude_deg": { "type": "number" },
+    "longitude_deg": { "type": "number" }
+  }
+}

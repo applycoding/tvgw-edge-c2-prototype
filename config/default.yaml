@@ -1,0 +1,69 @@
+# Corpus sizes, priority deadlines, and path defaults are fixed in code (see src/tvgw/corpus.py, models.py).
+
+gateway:
+  mtu_bytes: 160
+  max_queue_messages: 100
+  master_seed: 424242
+
+link:
+  turnaround_s: 0.20
+  prop_delay_s: 0.05
+  jitter_s: 0.01
+  preamble_bytes: 4
+  gilbert:
+    e_good: 0.001
+    e_bad: 0.80
+    p_bg: 0.20
+
+arq:
+  max_retries: 5
+  rto_margin_s: 0.25
+  rto_cap_s: 30.0
+  receiver_ack_gap_factor: 1.5
+
+sim:
+  arrival_window_s: 300.0
+  drain_horizon_s: 1800.0
+  background_count: 60
+  burst_count: 20
+  ci:
+    arrival_window_s: 120.0
+    drain_horizon_s: 600.0
+    background_count: 20
+    burst_count: 5
+    heartbeat_count: 4
+  burst_start_s: 100.0
+  burst_end_s: 105.0
+  heartbeat_interval_s: 30.0
+  heartbeat_count: 10
+
+sweep:
+  slice:
+    rates_bps: [300, 1200, 4800]
+    loss_rates: [0.0, 0.10, 0.30]
+    schedulings: [priority, fifo]
+    profiles: [xml_raw, xml_zstd_dict, cbor]
+    seeds: 10
+  full:
+    rates_bps: [300, 600, 1200, 2400, 4800, 9600]
+    loss_rates: [0.0, 0.05, 0.10, 0.20, 0.30]
+    schedulings: [priority, fifo]
+    profiles: [xml_raw, xml_zstd_dict, cbor, text, json]
+    seeds: 20
+  ci:
+    rates_bps: [300, 1200]
+    loss_rates: [0.0, 0.10]
+    schedulings: [priority, fifo]
+    profiles: [cbor, xml_zstd_dict]
+    seeds: 3
+
+outage:
+  rates_bps: [600, 1200]
+  loss_rate: 0.05
+  outage_start_s: 120.0
+  outage_end_s: 180.0
+  max_retries_variants: [5, 8]
+  seeds: 20
+
+paths:
+  zstd_dict: data/sample/niem_zstd.dict

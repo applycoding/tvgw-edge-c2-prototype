@@ -1,0 +1,19 @@
+{
+  "wall_clock_s": 728.3162274360657,
+  "last_step_wall_clock_s": 728.3162274360657,
+  "last_mode": "full",
+  "python": "3.12.3",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.39",
+  "master_seed": 424242,
+  "source_code_content_sha256": "a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6",
+  "provenance_note": "Results generated from code identical to this repository's initial commit (verify with source_code_content_sha256 over src/, scripts/, config/default.yaml).",
+  "sweep_grid": "rates=[300, 600, 1200, 2400, 4800, 9600] loss=[0.0, 0.05, 0.1, 0.2, 0.3] profiles=['xml_raw', 'xml_zstd_dict', 'cbor', 'text', 'json'] sched=['priority', 'fifo'] seeds=20",
+  "hashes": {
+    "m1_validation_summary.json": "9a501155d5df8b78db337c67281c9a103d26b7abb792d5af5d1d8b8d8085d05d",
+    "m1_mutation_breakdown.csv": "4e73d48bb33d21eb5af69fa1e8e34ac963ad75f823a9beb4cd8247f1fe6a0282",
+    "m2_size_comparison.csv": "cf19560d7dd95efca27ac47beee7d02dc26262526a3b5cb121564ee87bf325bc",
+    "m3_delivery_sweep.csv.gz": "db2f5b0891360257f86cd643708103d7136d25e4cac8b93c6a223d97ee818b69",
+    "m3_delivery_cells.csv": "051ef30a503827ae9863988941f0c28d17e18a488481a914073effcb2bae218d",
+    "m3_outage_scenario.csv": "b2f40ded3535c26ee311cf067a317eb94b2bee00a7b78c229229165f156983ed"
+  }
+}

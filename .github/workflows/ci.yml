@@ -1,0 +1,33 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -U pip
+          .venv/bin/pip install -r requirements.txt
+          .venv/bin/pip install -e .
+      - name: Download pinned datasets
+        run: .venv/bin/python scripts/download_niem.py && .venv/bin/python scripts/download_datasets.py
+      - name: Pytest
+        run: .venv/bin/python -m pytest -q
+      - name: Forbidden wording audit
+        run: .venv/bin/python scripts/audit_wording.py
+      - name: Reduced CI benchmark sweep (not equivalent to full make all)
+        run: time make ci
+      - name: Upload reduced benchmark artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tvgw-ci-benchmark-results
+          path: results/ci/

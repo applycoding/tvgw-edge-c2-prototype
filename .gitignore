@@ -1,0 +1,37 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python caches and build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# Downloaded / generated data (reproduced via make download-data)
+data/raw/
+data/corpus/
+
+# Local run logs
+*.log
+/tmp/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Do not commit uploads from agent sessions
+uploads/
+
+# Legacy nested path (removed)
+trivision/
+
+# CI reduced sweep output (generated in GitHub Actions / make ci)
+results/ci/
+
+# Full per-seed M3 rows (reproduced by make bench; committed as .csv.gz + cells)
+results/m3_delivery_sweep.csv
