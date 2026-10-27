@@ -23,12 +23,16 @@ sys.path.insert(0, str(ROOT / "src"))
 from tvgw.config_loader import load_config
 from tvgw.corpus import build_full_corpus, load_held_out, load_train_ids, write_corpus_artifacts
 from tvgw.encode import CodecRegistry, train_zstd_dictionary
+from tvgw.linkemu import OutageWindow
 from tvgw.mapping.niem_mo import detection_to_niem_xml
 from tvgw.metrics import export_prometheus, export_splunk_hec
 from tvgw.m3_io import GZIP_NAME, RAW_NAME, write_m3_artifacts
 from tvgw.plots import generate_all_plots
 from tvgw.sim import PROFILE_MAP, run_scenario
 from tvgw.validate import MUTATION_CLASSES, apply_mutation, validate_combined, validate_profile, validate_xsd
+
+# Scientific M1/M2/M3 tables in results/ were produced by the initial source tree.
+MEASURED_M1_M2_M3_SOURCE_SHA256 = "a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6"
 
 
 def sha256_file(path: Path) -> str:
@@ -111,8 +115,9 @@ def source_code_content_sha256(root: Path) -> str:
 
 
 PROVENANCE_NOTE = (
-    "Results generated from code identical to this repository's initial commit "
-    "(verify with source_code_content_sha256 over src/, scripts/, config/default.yaml)."
+    "M1, M2, and M3 tables and their scientific-output hashes were not recomputed by "
+    "summary-only or by later laboratory increments. source_code_content_sha256 is the "
+    "src/, scripts/, and config/default.yaml tree that wrote this file."
 )
 
 
@@ -299,8 +304,6 @@ def run_m3(root: Path, mode: str, cfg: dict, master_seed: int, results_dir: Path
     write_m3_artifacts(out_dir, rows)
 
     outage_rows = []
-    from tvgw.linkemu import OutageWindow
-
     outage_seeds = int(cfg["outage"].get("seeds", 20))
     for rate in cfg["outage"]["rates_bps"]:
         for retries in cfg["outage"]["max_retries_variants"]:
@@ -528,8 +531,10 @@ def write_summary(root: Path, meta: dict, results_dir: Path | None = None) -> No
     lines.append(f"\nBenchmark mode: `{meta.get('last_mode', 'unknown')}` (CI sweep is a reduced grid, not equivalent to full `make all`).")
     lines.append(
         f"\nProvenance: source code content SHA-256 `{meta.get('source_code_content_sha256', 'unknown')}`; "
+        f"M1/M2/M3 measured under `{meta.get('m1_m2_m3_measured_under_source_sha256', MEASURED_M1_M2_M3_SOURCE_SHA256)}`; "
         f"{meta.get('provenance_note', PROVENANCE_NOTE)}"
     )
+    lines.extend(_m4_lines(out_dir))
     lines.append(
         "\n## Transport honesty\n"
         "- Return-path ACK frames are transmitted on the emulated reverse channel with turnaround and loss; sender state advances only when an ACK is delivered.\n"
@@ -537,6 +542,43 @@ def write_summary(root: Path, meta: dict, results_dir: Path | None = None) -> No
         "- Evidence supports at most TRL-4 for the measured laboratory behaviors."
     )
     (out_dir / "SUMMARY.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _m4_lines(out_dir: Path) -> list[str]:
+    path = out_dir / "m4_association.csv"
+    lines = [
+        "",
+        "## M4 cross-source association (rule-based)",
+        "Optional step in `tvgw.associate`. It is not used by the M1, M2, or M3 measurement paths. "
+        "Command: `.venv/bin/python scripts/bench_association.py`.",
+        "",
+    ]
+    if not path.is_file():
+        lines.append("M4 table was not produced by this mode.")
+        return lines
+    with path.open(encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    if not rows:
+        lines.append("M4 table was empty.")
+        return lines
+    header = (
+        "| input_messages | output_messages | messages_saved | bytes_in_cbor | bytes_out_cbor | "
+        "bytes_saved | merged_detections | same_sensor_pairs_within_window |"
+    )
+    lines.extend([header, "|---:|---:|---:|---:|---:|---:|---:|---:|"])
+    for row in rows:
+        lines.append(
+            "| {input_messages} | {output_messages} | {messages_saved} | {bytes_in_cbor} | "
+            "{bytes_out_cbor} | {bytes_saved} | {merged_detections} | {same_sensor_pairs_within_window} |".format(
+                **row
+            )
+        )
+    lines.append("")
+    lines.append(
+        "The committed FIRMS Canada snapshot has one satellite id, so the cross-source rule saves no messages. "
+        "Pairs inside the window that share a sensor are counted and left unmerged."
+    )
+    return lines
 
 
 def ensure_dict(root: Path) -> None:
@@ -574,6 +616,13 @@ def main() -> None:
     prior: dict = {}
     if args.mode == "summary-only" and meta_path.is_file():
         prior = json.loads(meta_path.read_text(encoding="utf-8"))
+    if args.mode == "full":
+        measured_under = source_code_content_sha256(root)
+    else:
+        measured_under = prior.get(
+            "m1_m2_m3_measured_under_source_sha256",
+            MEASURED_M1_M2_M3_SOURCE_SHA256,
+        )
     meta = {
         "wall_clock_s": prior.get("wall_clock_s", wall) if args.mode == "summary-only" else wall,
         "last_step_wall_clock_s": wall,
@@ -582,6 +631,7 @@ def main() -> None:
         "platform": platform.platform(),
         "master_seed": args.master_seed,
         "source_code_content_sha256": source_code_content_sha256(root),
+        "m1_m2_m3_measured_under_source_sha256": measured_under,
         "provenance_note": PROVENANCE_NOTE,
         "sweep_grid": (
             sweep_grid_description(cfg, args.mode)

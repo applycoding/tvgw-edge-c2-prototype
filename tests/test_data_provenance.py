@@ -22,6 +22,10 @@ def test_source_code_content_sha256_matches_run_metadata():
     stored = meta.get("source_code_content_sha256")
     assert stored
     assert source_code_content_sha256(ROOT) == stored
+    assert (
+        meta.get("m1_m2_m3_measured_under_source_sha256")
+        == "a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6"
+    )
 
 
 def test_held_out_hash_readme_matches_summary_and_corpus():

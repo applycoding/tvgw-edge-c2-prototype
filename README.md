@@ -21,6 +21,9 @@ Public repository: [github.com/applycoding/tvgw-edge-c2-prototype](https://githu
 7. Payload size comparisons vs JPEG are **task-specific information selection**, not image compression.
 8. No novel CV models or operational GUI.
 9. **Evidence relevant to TRL 4 only** — not TRL 5+ and not certified.
+10. No learned detection model. Cross-source association is a deterministic distance, time, class, and sensor rule. It does not score whether a detection was correct.
+11. French operator strings are an unreviewed machine-assisted draft and need qualified human review before any use. This is not a fully bilingual interface.
+12. No Prometheus server, live Splunk deployment, or other monitoring product has been run against the laboratory `/metrics` text or the Splunk-HEC-shaped file.
 <!-- NOT-CLAIMED:END -->
 
 ## Validation layers
@@ -47,9 +50,22 @@ make download-data          # NIEM + HIT-UAV + builds held-out corpus locally
 make test                   # pytest (includes CI determinism on decompressed M3 CSV)
 make ci                     # reduced sweep → results/ci/ (GitHub Actions uses this)
 make all                    # long local run: full M3 + plots + audit
+.venv/bin/python scripts/bench_association.py
 ```
 
-**CI vs full sweep:** `make ci` runs a **reduced** grid (`config/default.yaml` → `sweep.ci`) and writes to `results/ci/`. It is **not** equivalent to the full `make all` grid committed as `results/m3_delivery_sweep.csv.gz` plus `results/m3_delivery_cells.csv` (regenerate per-seed rows with `make bench`).
+**CI vs full sweep:** `make ci` runs a **reduced** grid (`config/default.yaml` → `sweep.ci`) and writes to `results/ci/`. It is **not** equivalent to the full `make all` grid committed as `results/m3_delivery_sweep.csv.gz` plus `results/m3_delivery_cells.csv` (regenerate per-seed rows with `make bench`). The association table is separate: `.venv/bin/python scripts/bench_association.py` writes `results/m4_association.csv` and `results/m4_association.json`.
+
+## Operator text (`--lang en` and `--lang fr`)
+
+`tvgw validate`, `tvgw replay`, and `tvgw metrics serve` take `--lang`. English keeps the historical slash-report tokens (`MSGID`, `DTG`, `ENDAT`, and the others in `src/tvgw/messages.py`). French renders a second set of tokens and the CLI help and validation messages from the same catalog. The French strings are an unreviewed machine-assisted draft and need qualified human review before any use. Domain, service, and priority values stay as stored codes.
+
+## Laboratory metrics
+
+`tvgw metrics serve` runs one simulated scenario, then serves Prometheus text exposition on `/metrics` from a stdlib HTTP server (default bind `127.0.0.1`). The series are queue depth, delivery latency by priority, ARQ retries, failures, TVGW profile validation rejects, and link state (`down`, `idle`, or `busy`). `results/metrics.prom` and `results/splunk_hec_events.jsonl` are still the benchmark file exports. No external collector is part of this repository.
+
+## Cross-source association
+
+`associate_for_transmission` can merge detections from different `source_sensor` values before a caller transmits them, inside `association.max_distance_m` and `association.max_time_s` (`config/default.yaml`). The same object class is required unless `allow_cross_class` is true. The kept record is the highest-confidence contributor (ties: smallest `detection_id`), plus `contributing_source_ids`. The M3 grid does not call this step. On the committed FIRMS Canada snapshot every row is satellite `N20`, so the benchmark saves no messages; same-sensor pairs inside the window are counted and left unmerged.
 
 ## Simulated link model (M3)
 

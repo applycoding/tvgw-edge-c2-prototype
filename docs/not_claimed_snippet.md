@@ -10,4 +10,7 @@
 7. Task-Specific Information Selection, Not Lossless Image Compression.
 8. No Novel Computer Vision Model Claims or GUI.
 9. Evidence Relevant to TRL 4 Only — not certified, not TRL > 4.
+10. No learned detection model. Cross-source association is a deterministic distance, time, class, and sensor rule. It does not score whether a detection was correct.
+11. French operator strings are an unreviewed machine-assisted draft and need qualified human review before any use. This is not a fully bilingual interface.
+12. No Prometheus server, live Splunk deployment, or other monitoring product has been run against the laboratory `/metrics` text or the Splunk-HEC-shaped file.
 <!-- NOT-CLAIMED:END -->

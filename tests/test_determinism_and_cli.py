@@ -76,6 +76,12 @@ def test_audit_script(tmp_path):
 
     assert audit_file(pos)
     assert not audit_file(neg)
+    learned = tmp_path / "learned.md"
+    learned.write_text("A machine learning model reports detection accuracy.\n", encoding="utf-8")
+    assert audit_file(learned)
+    tool = tmp_path / "tool.md"
+    tool.write_text("Checked on a Prometheus server and a live Splunk indexer.\n", encoding="utf-8")
+    assert audit_file(tool)
 
 
 def test_prometheus_file_finite():

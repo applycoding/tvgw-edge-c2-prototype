@@ -12,6 +12,9 @@
 7. Task-Specific Information Selection, Not Lossless Image Compression.
 8. No Novel Computer Vision Model Claims or GUI.
 9. Evidence Relevant to TRL 4 Only — not certified, not TRL > 4.
+10. No learned detection model. Cross-source association is a deterministic distance, time, class, and sensor rule. It does not score whether a detection was correct.
+11. French operator strings are an unreviewed machine-assisted draft and need qualified human review before any use. This is not a fully bilingual interface.
+12. No Prometheus server, live Splunk deployment, or other monitoring product has been run against the laboratory `/metrics` text or the Splunk-HEC-shaped file.
 <!-- NOT-CLAIMED:END -->
 
 
@@ -107,7 +110,7 @@ Grid: `rates=[300, 600, 1200, 2400, 4800, 9600] loss=[0.0, 0.05, 0.1, 0.2, 0.3] 
 - niem_zip: `2b899067b5312333935329e6e7665e1eb295f392a51d4a56bc9800dbcc42fcfa`
 - niem_zstd_dict: `39b73b339960a296d2246209c6d1099b532d1dc0fcfaa3f36ea2035c06f4691e`
 - held_out_corpus: `863f7c7a7dab2bba67c70fdabe07d40d6deaf48dc299edb5e2d798e540130bfd`
-- config_default_yaml: `6ee6d0103276ec1dce6db77f2508f8787d027653b93d7603a0ff8d7dbc21e886`
+- config_default_yaml: `c6ecd6e2639dd2a5f199fd3eee3a2e55ef36ec8c595fcf84b593690ab9030e31`
 
 ## SHA-256 hashes (scientific outputs)
 - m1_validation_summary.json: `9a501155d5df8b78db337c67281c9a103d26b7abb792d5af5d1d8b8d8085d05d`
@@ -121,7 +124,16 @@ Full benchmark wall-clock (last full/slice run): 728.3162274360657 s
 
 Benchmark mode: `full` (CI sweep is a reduced grid, not equivalent to full `make all`).
 
-Provenance: source code content SHA-256 `a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6`; Results generated from code identical to this repository's initial commit (verify with source_code_content_sha256 over src/, scripts/, config/default.yaml).
+Provenance: source code content SHA-256 `6c04467abb25305eb8a4a20ba2b920cce5562b3e05db3a17138087620eb33540`; M1/M2/M3 measured under `a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6`; M1, M2, and M3 tables and their scientific-output hashes were not recomputed by summary-only or by later laboratory increments. source_code_content_sha256 is the src/, scripts/, and config/default.yaml tree that wrote this file.
+
+## M4 cross-source association (rule-based)
+Optional step in `tvgw.associate`. It is not used by the M1, M2, or M3 measurement paths. Command: `.venv/bin/python scripts/bench_association.py`.
+
+| input_messages | output_messages | messages_saved | bytes_in_cbor | bytes_out_cbor | bytes_saved | merged_detections | same_sensor_pairs_within_window |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 720 | 720 | 0 | 210191 | 210191 | 0 | 0 | 850 |
+
+The committed FIRMS Canada snapshot has one satellite id, so the cross-source rule saves no messages. Pairs inside the window that share a sensor are counted and left unmerged.
 
 ## Transport honesty
 - Return-path ACK frames are transmitted on the emulated reverse channel with turnaround and loss; sender state advances only when an ACK is delivered.

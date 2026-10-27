@@ -22,6 +22,14 @@ PATTERNS = [
     r"battle-proven",
     r"combat-ready",
     r"derived from F\.1487",
+    r"machine[- ]learning",
+    r"deep[- ]learning",
+    r"neural network",
+    r"detection[- ]accuracy",
+    r"fully bilingual",
+    r"Prometheus server",
+    r"live Splunk",
+    r"Splunk[- ]certified",
 ]
 
 HITUAV_PUBLIC_DOMAIN = re.compile(r"public[- ]domain.*HIT-UAV|HIT-UAV.*public[- ]domain", re.I)
