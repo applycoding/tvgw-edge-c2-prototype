@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Literal, Never
 
 from tvgw.models import (
     Detection,
@@ -12,6 +13,8 @@ from tvgw.models import (
     OperationalDomain,
     Priority,
 )
+
+SensorIdFrom = Literal["constant", "satellite"]
 
 
 def _parse_confidence(raw: str) -> float:
@@ -65,7 +68,21 @@ def _parse_acq_date(raw: str) -> datetime:
         return datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
-def load_firms_detections(csv_path: Path, row_limit: int | None = None) -> list[Detection]:
+def _source_sensor(row: dict[str, str], sensor_id_from: SensorIdFrom) -> str:
+    if sensor_id_from == "constant":
+        return "NASA-FIRMS-VIIRS"
+    if sensor_id_from == "satellite":
+        satellite = (row.get("satellite") or "").strip() or "UNKNOWN"
+        return f"FIRMS-{satellite}"
+    unexpected: Never = sensor_id_from
+    raise ValueError(f"unknown sensor_id_from: {unexpected}")
+
+
+def load_firms_detections(
+    csv_path: Path,
+    row_limit: int | None = None,
+    sensor_id_from: SensorIdFrom = "constant",
+) -> list[Detection]:
     detections: list[Detection] = []
     with csv_path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -80,11 +97,12 @@ def load_firms_detections(csv_path: Path, row_limit: int | None = None) -> list[
             det_id = f"FIRMS_{row.get('acq_date', 'NA').replace('-', '')}_{idx:04d}"
             conf = _parse_confidence(row.get("confidence", ""))
             priority = Priority.P0_FLASH if conf >= 0.85 else Priority.P1_IMMEDIATE
+            source_sensor = _source_sensor(row, sensor_id_from)
             detections.append(
                 Detection(
                     detection_id=det_id,
                     timestamp_utc=ts,
-                    source_sensor="NASA-FIRMS-VIIRS",
+                    source_sensor=source_sensor,
                     domain=OperationalDomain.SPACE,
                     functional_service=FunctionalService.INTEL,
                     object_class="fire_hotspot",

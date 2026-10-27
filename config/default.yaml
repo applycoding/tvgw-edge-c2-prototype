@@ -67,3 +67,9 @@ outage:
 
 paths:
   zstd_dict: data/sample/niem_zstd.dict
+
+# Rule-based cross-source association. The M3 delivery grid does not apply it.
+association:
+  max_distance_m: 1000
+  max_time_s: 1800
+  allow_cross_class: false

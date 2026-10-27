@@ -1,0 +1,25 @@
+{
+  "byte_profile": "cbor",
+  "command": ".venv/bin/python scripts/bench_association.py",
+  "csv_sha256": "768da84d4bc351cfcd5703dec279633d8ad7ae622cab9d9a474bc1e379fb7dd9",
+  "dataset_sha256": "eceac7905c3aedd66578c8c2b1a01cde7f5fafc8ac387aa0359c2367a919bf1b",
+  "note": "Rule-based cross-source association on the committed NASA FIRMS Canada 24h snapshot. Sensor identity for this table is the CSV satellite column (FIRMS-<satellite>), which is a single value in this file, so different sensors do not occur. same_sensor_pairs_within_window counts overlaps the rule leaves unmerged. This is not a score of whether a hotspot was correct, and it is not part of the M3 grid.",
+  "row": {
+    "allow_cross_class": false,
+    "bytes_in_cbor": 210191,
+    "bytes_out_cbor": 210191,
+    "bytes_saved": 0,
+    "dataset": "data/sample/firms_canada_24h_snapshot.csv",
+    "different_class_pairs_within_window": 0,
+    "different_sensor_pairs_within_window": 0,
+    "input_messages": 720,
+    "max_distance_m": 1000.0,
+    "max_time_s": 1800.0,
+    "merged_detections": 0,
+    "messages_saved": 0,
+    "multi_source_clusters": 0,
+    "output_messages": 720,
+    "same_sensor_pairs_within_window": 850,
+    "sensor_id_from": "satellite"
+  }
+}

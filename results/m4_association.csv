@@ -1,0 +1,2 @@
+dataset,sensor_id_from,max_distance_m,max_time_s,allow_cross_class,input_messages,output_messages,messages_saved,bytes_in_cbor,bytes_out_cbor,bytes_saved,merged_detections,multi_source_clusters,same_sensor_pairs_within_window,different_sensor_pairs_within_window,different_class_pairs_within_window
+data/sample/firms_canada_24h_snapshot.csv,satellite,1000.0,1800.0,False,720,720,0,210191,210191,0,0,0,850,0,0

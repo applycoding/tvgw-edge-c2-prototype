@@ -5,7 +5,7 @@ PY := $(BIN)/python
 PIP := $(BIN)/pip
 MASTER_SEED ?= 424242
 
-.PHONY: setup venv download-data test slice bench ci plots summary audit all clean
+.PHONY: setup venv download-data test slice bench ci plots summary audit bench-assoc all clean
 
 venv:
 	$(PYTHON) -m venv $(VENV)
@@ -27,6 +27,9 @@ slice:
 
 bench:
 	$(PY) scripts/run_all_benchmarks.py --mode full --master-seed $(MASTER_SEED)
+
+bench-assoc:
+	$(PY) scripts/bench_association.py
 
 ci:
 	$(PY) scripts/run_all_benchmarks.py --mode ci --master-seed $(MASTER_SEED) --results-dir results/ci
