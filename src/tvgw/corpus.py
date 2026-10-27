@@ -4,11 +4,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
-from tvgw.models import Detection
+from tvgw.models import Detection, FunctionalService, OperationalDomain, Priority
 from tvgw.sources.firms import load_firms_detections
 from tvgw.sources.hituav import load_all_hituav
+
+# Held-in split used to train the zstd dictionary. The IDs are NASA FIRMS
+# record IDs (they sort before HIT-UAV IDs); the historical filename was misleading.
+TRAIN_IDS_FILENAME = "firms_train_ids_500.json"
 
 
 def build_full_corpus(root: Path) -> list[Detection]:
@@ -33,7 +38,7 @@ def write_corpus_artifacts(root: Path) -> dict:
     train = corpus[:500]
     held_out = corpus[500:5500]
     train_ids = [d.detection_id for d in train]
-    train_path = root / "data" / "sample" / "hituav_train_Ids_500.json"
+    train_path = train_ids_path(root)
     train_path.write_text(json.dumps(train_ids, indent=2) + "\n", encoding="utf-8")
 
     held_path = root / "data" / "corpus" / "held_out_5000.jsonl"
@@ -76,9 +81,12 @@ def load_held_out(root: Path) -> list[Detection]:
     return out
 
 
+def train_ids_path(root: Path) -> Path:
+    return root / "data" / "sample" / TRAIN_IDS_FILENAME
+
+
 def load_train_ids(root: Path) -> set[str]:
-    p = root / "data" / "sample" / "hituav_train_Ids_500.json"
-    return set(json.loads(p.read_text(encoding="utf-8")))
+    return set(json.loads(train_ids_path(root).read_text(encoding="utf-8")))
 
 
 def _sha(path: Path) -> str:
@@ -107,10 +115,6 @@ def _det_to_dict(d: Detection) -> dict:
 
 
 def _dict_to_det(data: dict) -> Detection:
-    from datetime import datetime, timezone
-
-    from tvgw.models import FunctionalService, OperationalDomain, Priority
-
     ts = datetime.fromisoformat(data["timestamp_utc"].replace("Z", "+00:00"))
     return Detection(
         detection_id=data["detection_id"],

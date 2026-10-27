@@ -14,7 +14,7 @@ Suo, J., Wang, T., Zhang, X., Chen, H., Zhou, W., & Shi, W. (2023).
 HIT-UAV: A high-altitude infrared thermal dataset for Unmanned Aerial Vehicle-based object detection.
 Scientific Data, 10, 227. https://doi.org/10.1038/s41597-023-02066-6
 
-**Modified / derived in this repo:** the sample thermal JPEG (`data/sample/sample_thermal_0_100_30_0_03307.jpg`), dictionary-training ID list, and canonical detection records derived from upstream JSON annotations (synthetic Calgary GPS tracks for HIT-UAV items).
+**Modified / derived in this repo:** the sample thermal JPEG (`data/sample/sample_thermal_0_100_30_0_03307.jpg`), the held-in ID list `data/sample/firms_train_ids_500.json` (NASA FIRMS record IDs used to train the zstd dictionary; these are not HIT-UAV IDs), and canonical detection records derived from upstream JSON annotations (synthetic Calgary GPS tracks for HIT-UAV items).
 
 ## NASA FIRMS Active Fire Data
 NASA Earth Science Data and Information System (ESDIS) open data policy applies.

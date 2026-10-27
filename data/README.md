@@ -8,7 +8,8 @@
 - Source (commit-pinned in `scripts/download_datasets.py`): https://github.com/suojiashun/HIT-UAV-Infrared-Thermal-Dataset
 - train/val/test JSON SHA-256: `4e6e93966ec366ce63aa120f038c52e792b02811ff2ab2d43ef56e6561aceff1`, `9b34b423b6b1602b87e88b7f9864fa4273b73c280846ba6cb1b90c2e6761873e`, `f29545df4b27bb09fa705b0d2865f69f5ef7cdf81930b84dcc9dd0df63c71d19`
 - Images: 2898, annotations: 24751
-- Dictionary training IDs (`hituav_train_Ids_500.json`): `751beab1cbdfea7146a903c722d101385669b7cf4f1f6298637ae85446505c7a`
+- Held-in zstd-dictionary training IDs (`firms_train_ids_500.json`): `751beab1cbdfea7146a903c722d101385669b7cf4f1f6298637ae85446505c7a`
+- Those 500 IDs are NASA FIRMS detection IDs (`FIRMS_...`). The previous filename `hituav_train_Ids_500.json` did not match the contents. The file bytes are unchanged.
 
 ## NASA FIRMS Canada 24h snapshot
 - Committed file: `data/sample/firms_canada_24h_snapshot.csv`
