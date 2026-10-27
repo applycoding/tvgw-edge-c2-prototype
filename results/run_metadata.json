@@ -1,11 +1,11 @@
 {
   "wall_clock_s": 728.3162274360657,
-  "last_step_wall_clock_s": 7.152557373046875e-07,
+  "last_step_wall_clock_s": null,
   "last_mode": "full",
   "python": "3.12.3",
   "platform": "Linux-6.12.94+-x86_64-with-glibc2.39",
   "master_seed": 424242,
-  "source_code_content_sha256": "6c04467abb25305eb8a4a20ba2b920cce5562b3e05db3a17138087620eb33540",
+  "source_code_content_sha256": "f7f7828b904936a8d05db7faa4a0b10830fcad52e9bbff79920bfa9f24d11185",
   "m1_m2_m3_measured_under_source_sha256": "a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6",
   "provenance_note": "M1, M2, and M3 tables and their scientific-output hashes were not recomputed by summary-only or by later laboratory increments. source_code_content_sha256 is the src/, scripts/, and config/default.yaml tree that wrote this file.",
   "sweep_grid": "rates=[300, 600, 1200, 2400, 4800, 9600] loss=[0.0, 0.05, 0.1, 0.2, 0.3] profiles=['xml_raw', 'xml_zstd_dict', 'cbor', 'text', 'json'] sched=['priority', 'fifo'] seeds=20",

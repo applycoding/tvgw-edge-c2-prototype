@@ -7,7 +7,7 @@ Public repository: [github.com/applycoding/tvgw-edge-c2-prototype](https://githu
 
 **What this is:** A Python prototype that ingests openly licensed public edge detections (HIT-UAV thermal annotations under **CC BY 4.0**, and a NASA FIRMS fire hotspot snapshot), maps them to NIEM 6.0 `mo:Observation` XML plus alternate wire profiles, and benchmarks delivery over a **simulated** half-duplex narrowband link (`linkemu.py`).
 
-**What was measured:** Empirical tables and plots are in [`results/SUMMARY.md`](results/SUMMARY.md) and CSV/PNG artifacts under `results/`, produced by `make bench` / `make all` on the committed code.
+**What was measured:** Empirical tables and plots are in [`results/SUMMARY.md`](results/SUMMARY.md) and CSV/PNG artifacts under `results/`, produced by `make bench` / `make all` on the committed code. The zstd dictionary was trained on 500 NASA FIRMS records only while the held-out set is 4,780 HIT-UAV and 220 FIRMS records, so the xml_zstd_dict figure depends on that training choice.
 
 <!-- NOT-CLAIMED:BEGIN -->
 ## What Is Not Claimed (Scope & Limitations)

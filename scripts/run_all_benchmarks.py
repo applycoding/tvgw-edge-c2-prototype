@@ -498,6 +498,9 @@ def write_summary(root: Path, meta: dict, results_dir: Path | None = None) -> No
         "",
         *_m2_table(out_dir),
         "",
+        "The zstd dictionary was trained on 500 NASA FIRMS records only while the held-out set is "
+        "4,780 HIT-UAV and 220 FIRMS records, so the xml_zstd_dict figure depends on that training choice.",
+        "",
         "**Assumption (reference only):** a 2 Mbps 1080p H.264 video stream (~2×10⁶ bps) is orders of magnitude larger than the measured detection payloads; "
         "payload tables compare structured detection encodings, not video transport.",
         "",
@@ -510,6 +513,9 @@ def write_summary(root: Path, meta: dict, results_dir: Path | None = None) -> No
         f"{pv_excerpt_rows} of {pv_data_rows} rate×loss×profile rows — full table in `m3_delivery_cells.csv`)",
         "",
         *pv_lines[: pv_excerpt_rows + 2],
+        "",
+        "The zstd dictionary was trained on 500 NASA FIRMS records only while the held-out set is "
+        "4,780 HIT-UAV and 220 FIRMS records, so the xml_zstd_dict figure depends on that training choice.",
         "",
         "## Outage scenario (60 s link down 120–180 s)",
         "",

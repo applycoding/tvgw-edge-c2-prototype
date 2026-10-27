@@ -40,6 +40,8 @@ HIT-UAV positions in NIEM XML are tagged `[SYNTH-GPS]` in the object name; XML c
 | text_raw | 298.0 | 294.5194 | 301.0 |
 | uncompressed_640x512_8bit | 327680 | 327680 | 327680 |
 
+The zstd dictionary was trained on 500 NASA FIRMS records only while the held-out set is 4,780 HIT-UAV and 220 FIRMS records, so the xml_zstd_dict figure depends on that training choice.
+
 **Assumption (reference only):** a 2 Mbps 1080p H.264 video stream (~2×10⁶ bps) is orders of magnitude larger than the measured detection payloads; payload tables compare structured detection encodings, not video transport.
 
 ## M3 delivery grid (cbor profile excerpt; full grid in `m3_delivery_cells.csv`)
@@ -89,6 +91,8 @@ Grid: `rates=[300, 600, 1200, 2400, 4800, 9600] loss=[0.0, 0.05, 0.1, 0.2, 0.3] 
 | 300 | 0.1 | xml_zstd_dict | 0.9016 | 0.3352 | 0.4986 | 0.6332 |
 | 300 | 0.2 | cbor | 0.2322 | 0.0369 | 0.1590 | 0.2369 |
 
+The zstd dictionary was trained on 500 NASA FIRMS records only while the held-out set is 4,780 HIT-UAV and 220 FIRMS records, so the xml_zstd_dict figure depends on that training choice.
+
 ## Outage scenario (60 s link down 120–180 s)
 
 | rate_bps | max_retries | mean_p0_failed | ci_low | ci_high | n_seeds |
@@ -124,7 +128,7 @@ Full benchmark wall-clock (last full/slice run): 728.3162274360657 s
 
 Benchmark mode: `full` (CI sweep is a reduced grid, not equivalent to full `make all`).
 
-Provenance: source code content SHA-256 `6c04467abb25305eb8a4a20ba2b920cce5562b3e05db3a17138087620eb33540`; M1/M2/M3 measured under `a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6`; M1, M2, and M3 tables and their scientific-output hashes were not recomputed by summary-only or by later laboratory increments. source_code_content_sha256 is the src/, scripts/, and config/default.yaml tree that wrote this file.
+Provenance: source code content SHA-256 `f7f7828b904936a8d05db7faa4a0b10830fcad52e9bbff79920bfa9f24d11185`; M1/M2/M3 measured under `a3b748dcb5fe3429b1e155aa7572d3f9835053b71732deadbac2b42f09a791a6`; M1, M2, and M3 tables and their scientific-output hashes were not recomputed by summary-only or by later laboratory increments. source_code_content_sha256 is the src/, scripts/, and config/default.yaml tree that wrote this file.
 
 ## M4 cross-source association (rule-based)
 Optional step in `tvgw.associate`. It is not used by the M1, M2, or M3 measurement paths. Command: `.venv/bin/python scripts/bench_association.py`.
