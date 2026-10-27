@@ -625,7 +625,7 @@ def main() -> None:
         )
     meta = {
         "wall_clock_s": prior.get("wall_clock_s", wall) if args.mode == "summary-only" else wall,
-        "last_step_wall_clock_s": wall,
+        "last_step_wall_clock_s": None if args.mode == "summary-only" else wall,
         "last_mode": prior.get("last_mode", args.mode) if args.mode == "summary-only" else args.mode,
         "python": platform.python_version(),
         "platform": platform.platform(),
