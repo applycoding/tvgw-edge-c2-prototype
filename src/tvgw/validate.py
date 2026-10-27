@@ -11,7 +11,8 @@ from xml.etree import ElementTree as ET
 
 from lxml import etree
 
-from tvgw.mapping.niem_mo import MO_NS, NC_NS, STRUCT_NS
+from tvgw.mapping.niem_mo import MO_NS, NC_NS, STRUCT_NS, detection_to_niem_xml
+from tvgw.models import Detection
 
 MUTATION_CLASSES = [
     "missing_name",
@@ -123,6 +124,15 @@ def validate_profile(xml_bytes: bytes) -> ValidationOutcome:
         return ValidationOutcome(False, "profile", "duplicate siblings")
 
     return ValidationOutcome(True, "ok")
+
+
+def count_profile_rejects(detections: list[Detection]) -> int:
+    """Count TVGW profile failures. This does not run XSD validation."""
+    rejects = 0
+    for det in detections:
+        if not validate_profile(detection_to_niem_xml(det)).ok:
+            rejects += 1
+    return rejects
 
 
 def validate_combined(xml_bytes: bytes, root: Path) -> ValidationOutcome:

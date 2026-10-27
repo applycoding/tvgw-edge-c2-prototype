@@ -13,6 +13,7 @@ import numpy as np
 from tvgw.encode import CodecRegistry
 from tvgw.fragment import WireFrame, build_ack_frame, fragment_payload
 from tvgw.linkemu import LinkEmulator, OutageWindow
+from tvgw.metrics_live import LiveMetrics
 from tvgw.models import Detection, Priority, deadline_s
 from tvgw.priority import PriorityQueue, QueuedMessage
 
@@ -28,6 +29,7 @@ class SimResult:
     generated: Dict[int, int] = field(default_factory=lambda: {0: 0, 1: 0, 2: 0})
     admitted: Dict[int, int] = field(default_factory=lambda: {0: 0, 1: 0, 2: 0})
     latencies: List[float] = field(default_factory=list)
+    latencies_by_priority: Dict[int, List[float]] = field(default_factory=lambda: {0: [], 1: [], 2: []})
     censored: int = 0
     goodput_bps: float = 0.0
     link_busy_end_s: float = 0.0
@@ -128,6 +130,7 @@ def run_scenario(
     outages: List[OutageWindow] | None = None,
     max_retries: int | None = None,
     trace: List[dict] | None = None,
+    metrics: LiveMetrics | None = None,
 ) -> SimResult:
     from tvgw.corpus import load_held_out
 
@@ -191,7 +194,16 @@ def run_scenario(
                     "timer_end": None,
                     "frames": None,
                 }
-                _start_burst(in_flight, link_fwd, mtu, pflags, result, cfg, max(now, link_fwd.medium_free_at_s))
+                _start_burst(
+                    in_flight,
+                    link_fwd,
+                    mtu,
+                    pflags,
+                    result,
+                    cfg,
+                    max(now, link_fwd.medium_free_at_s),
+                    metrics,
+                )
 
         if in_flight and in_flight.get("done"):
             delivered_cum += 1
@@ -214,6 +226,7 @@ def run_scenario(
                     result,
                     cfg,
                     max(now, link_fwd.medium_free_at_s),
+                    metrics,
                 )
 
         if trace is not None:
@@ -226,6 +239,7 @@ def run_scenario(
                     "medium_free_at_s": link_fwd.medium_free_at_s,
                 }
             )
+        _publish_metrics(metrics, now, pq, in_flight, link_fwd, result, outages)
 
         if arrival_idx >= len(arrivals) and in_flight is None and not pq.queue:
             if now >= link_fwd.medium_free_at_s:
@@ -245,7 +259,41 @@ def run_scenario(
     if result.link_busy_end_s > 0:
         result.goodput_bps = (result.delivered_bytes * 8) / result.link_busy_end_s
     result.crc_errors_detected = link_fwd.crc_errors_detected
+    _publish_metrics(metrics, now, pq, in_flight, link_fwd, result, outages)
     return result
+
+
+def _link_state_name(
+    now: float,
+    in_flight: dict | None,
+    link: LinkEmulator,
+    outages: List[OutageWindow] | None,
+) -> str:
+    for win in outages or []:
+        if win.start_s <= now <= win.end_s:
+            return "down"
+    if in_flight is not None or now < link.medium_free_at_s:
+        return "busy"
+    return "idle"
+
+
+def _publish_metrics(
+    metrics: LiveMetrics | None,
+    now: float,
+    pq: PriorityQueue,
+    in_flight: dict | None,
+    link: LinkEmulator,
+    result: SimResult,
+    outages: List[OutageWindow] | None,
+) -> None:
+    if metrics is None:
+        return
+    metrics.observe(
+        queue_depth=len(pq.queue),
+        link_state=_link_state_name(now, in_flight, link, outages),
+        retries=result.arq_retransmissions,
+        failures=result.failed,
+    )
 
 
 def _start_burst(
@@ -256,6 +304,7 @@ def _start_burst(
     result: SimResult,
     cfg: dict,
     start_s: float,
+    metrics: LiveMetrics | None = None,
 ) -> None:
     job = job_state["job"]
     arq_cfg = cfg["arq"]
@@ -330,6 +379,9 @@ def _start_burst(
         else:
             result.delivered_late[pri] += 1
         result.latencies.append(latency)
+        result.latencies_by_priority[pri].append(latency)
+        if metrics is not None:
+            metrics.record_delivery(pri, latency)
         result.delivered_bytes += len(job.payload)
         job_state["done"] = True
         job_state["timer_end"] = None
