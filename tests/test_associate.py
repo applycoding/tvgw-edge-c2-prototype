@@ -81,10 +81,72 @@ def test_different_sensors_keep_highest_confidence_and_ids():
     assert kept.detection_id == "HIGH_1"
     assert kept.confidence_score == 0.95
     assert kept.latitude_deg == high.latitude_deg
-    assert kept.priority == Priority.P2_ROUTINE
+    assert kept.priority == Priority.P0_FLASH
     assert kept.attributes["contributing_source_ids"] == ["HIGH_1", "LOW_1"]
     assert kept.attributes["contributing_sensors"] == ["FIRMS-N20", "FIRMS-N21"]
     assert high.attributes == original_attrs
+
+
+def test_repeated_sensor_does_not_rejoin_a_mixed_cluster():
+    start = datetime(2026, 10, 25, 6, 50, tzinfo=timezone.utc)
+    first_s1 = _det(
+        detection_id="S1_FIRST",
+        source_sensor="S1",
+        timestamp_utc=start,
+        confidence_score=0.4,
+    )
+    s2 = _det(
+        detection_id="S2_MID",
+        source_sensor="S2",
+        timestamp_utc=start + timedelta(seconds=1),
+        confidence_score=0.8,
+    )
+    second_s1 = _det(
+        detection_id="S1_AGAIN",
+        source_sensor="S1",
+        timestamp_utc=start + timedelta(seconds=2),
+        confidence_score=0.99,
+    )
+    forward = associate_for_transmission([second_s1, first_s1, s2], _windows())
+    backward = associate_for_transmission([s2, second_s1, first_s1], _windows())
+    assert forward.output_count == backward.output_count == 2
+    assert [record.detection_id for record in forward.records] == [
+        record.detection_id for record in backward.records
+    ]
+    merged = next(record for record in forward.records if "contributing_source_ids" in record.attributes)
+    alone = next(record for record in forward.records if "contributing_source_ids" not in record.attributes)
+    assert merged.attributes["contributing_source_ids"] == ["S1_FIRST", "S2_MID"]
+    assert merged.attributes["contributing_sensors"] == ["S1", "S2"]
+    assert alone is second_s1
+    assert alone.detection_id == "S1_AGAIN"
+    assert "S1_AGAIN" not in merged.attributes["contributing_source_ids"]
+
+
+def test_merged_priority_is_most_urgent():
+    urgent = _det(
+        detection_id="URGENT_LOW",
+        source_sensor="SENSOR-A",
+        confidence_score=0.2,
+        latitude_deg=48.0,
+        longitude_deg=-64.0,
+        priority=Priority.P0_FLASH,
+    )
+    routine = _det(
+        detection_id="ROUTINE_HIGH",
+        source_sensor="SENSOR-B",
+        confidence_score=0.99,
+        latitude_deg=48.002,
+        longitude_deg=-64.002,
+        priority=Priority.P2_ROUTINE,
+    )
+    outcome = associate_for_transmission([routine, urgent], _windows())
+    assert outcome.output_count == 1
+    kept = outcome.records[0]
+    assert kept.priority == Priority.P0_FLASH
+    assert kept.confidence_score == 0.99
+    assert kept.detection_id == "ROUTINE_HIGH"
+    assert kept.latitude_deg == routine.latitude_deg
+    assert kept.longitude_deg == routine.longitude_deg
 
 
 def test_confidence_tie_uses_smallest_detection_id():

@@ -22,9 +22,9 @@ No external collector is included.
 
 ## Cross-source association
 
-`tvgw.associate.associate_for_transmission` merges records whose `source_sensor` values differ when they are inside the configured distance and time of the cluster anchor and share an object class (`association.allow_cross_class` overrides the class check).
+`tvgw.associate.associate_for_transmission` merges a detection into a cluster only when its `source_sensor` differs from every sensor already in that cluster, the detection is inside the configured distance and time of the cluster anchor, and the object classes match (`association.allow_cross_class` overrides the class check).
 The anchor is the highest-confidence member; equal confidence keeps the smallest `detection_id`.
-A candidate is compared with that anchor, not with every member.
-The kept record uses the anchor's position, class, and priority. `attributes["contributing_source_ids"]` lists contributor detection ids.
+Distance and time use that anchor, not every member.
+The kept record uses the anchor's position and class and the highest contributor confidence. Priority is the most urgent (lowest number) among contributors. `attributes["contributing_source_ids"]` lists contributor detection ids.
 The M3 delivery grid does not call this function.
 Benchmark command from the repository root: `.venv/bin/python scripts/bench_association.py`.

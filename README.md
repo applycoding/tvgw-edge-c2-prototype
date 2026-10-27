@@ -65,7 +65,7 @@ make all                    # long local run: full M3 + plots + audit
 
 ## Cross-source association
 
-`associate_for_transmission` can merge detections from different `source_sensor` values before a caller transmits them, inside `association.max_distance_m` and `association.max_time_s` (`config/default.yaml`). The same object class is required unless `allow_cross_class` is true. The kept record is the highest-confidence contributor (ties: smallest `detection_id`), plus `contributing_source_ids`. The M3 grid does not call this step. On the committed FIRMS Canada snapshot every row is satellite `N20`, so the benchmark saves no messages; same-sensor pairs inside the window are counted and left unmerged.
+`associate_for_transmission` merges a detection into a cluster only when its `source_sensor` differs from every sensor already in that cluster, inside `association.max_distance_m` and `association.max_time_s` (`config/default.yaml`). The same object class is required unless `allow_cross_class` is true. Position and confidence come from the highest-confidence contributor (ties: smallest `detection_id`), with `contributing_source_ids`. Priority on the merged record is the most urgent (lowest number) among contributors. The M3 grid does not call this step. On the committed FIRMS Canada snapshot every row is satellite `N20`, so the benchmark saves no messages; same-sensor pairs inside the window are counted and left unmerged.
 
 ## Simulated link model (M3)
 

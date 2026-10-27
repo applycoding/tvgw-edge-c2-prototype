@@ -1,10 +1,12 @@
 """Rule-based cross-source association applied before transmission.
 
-Detections merge only when their sensors differ, they fall inside the
-configured distance and time windows of the cluster anchor, and their object
-classes match (unless cross-class merges are configured). The kept record is
-the highest-confidence contributor. Ties keep the smallest detection id.
-This step does not score whether a detection was correct.
+A detection joins a cluster only when its sensor differs from every sensor
+already in that cluster, it falls inside the configured distance and time
+windows of the cluster anchor, and its object class matches (unless
+cross-class merges are configured). Position and confidence come from the
+highest-confidence contributor. The transmitted priority is the most urgent
+(lowest number) among contributors. Ties on confidence keep the smallest
+detection id. This step does not score whether a detection was correct.
 """
 
 from __future__ import annotations
@@ -75,7 +77,8 @@ def _time_delta_s(left: Detection, right: Detection) -> float:
 
 
 def _cross_source(det: Detection, cluster: _Cluster) -> bool:
-    return any(member.source_sensor != det.source_sensor for member in cluster.members)
+    """True when det's sensor is absent from every member already in the cluster."""
+    return all(member.source_sensor != det.source_sensor for member in cluster.members)
 
 
 def _class_compatible(det: Detection, cluster: _Cluster, allow_cross_class: bool) -> bool:
@@ -103,7 +106,7 @@ def _emit(cluster: _Cluster) -> Detection:
         confidence_score=max(member.confidence_score for member in cluster.members),
         latitude_deg=anchor.latitude_deg,
         longitude_deg=anchor.longitude_deg,
-        priority=anchor.priority,
+        priority=min(member.priority for member in cluster.members),
         altitude_m=anchor.altitude_m,
         attributes=attributes,
     )
@@ -115,10 +118,11 @@ def associate_for_transmission(
 ) -> AssociationOutcome:
     """Return the records that would be transmitted after association.
 
-    A detection joins at most one existing cluster. The comparison is against
-    that cluster's anchor (highest confidence, then smallest detection id),
-    not against every member. Input order does not matter: candidates are
-    processed by timestamp, detection id, then sensor.
+    A detection joins at most one existing cluster, and only when its sensor
+    differs from every sensor already in that cluster. Distance and time are
+    compared with the cluster anchor (highest confidence, then smallest
+    detection id), not with every member. Input order does not matter:
+    candidates are processed by timestamp, detection id, then sensor.
     """
     ordered = sorted(
         detections,
