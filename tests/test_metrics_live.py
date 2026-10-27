@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.prometheus_text import PrometheusTextError, parse_prometheus_text, sample_value
+from tvgw.cli import serve_until_interrupt
 from tvgw.config_loader import load_config
 from tvgw.metrics_live import LiveMetrics, start_metrics_server
 from tvgw.sim import run_scenario
@@ -25,6 +26,22 @@ def _scrape(port: int, path: str) -> tuple[int, str, str]:
         except urllib.error.URLError as exc:
             last_error = exc
     raise AssertionError(last_error)
+
+
+def test_ctrl_c_closes_metrics_socket_without_traceback():
+    class _Server:
+        def __init__(self) -> None:
+            self.closed = False
+
+        def serve_forever(self) -> None:
+            raise KeyboardInterrupt
+
+        def server_close(self) -> None:
+            self.closed = True
+
+    server = _Server()
+    serve_until_interrupt(server)
+    assert server.closed
 
 
 def test_parser_rejects_malformed_exposition():

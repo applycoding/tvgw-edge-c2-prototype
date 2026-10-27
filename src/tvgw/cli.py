@@ -240,8 +240,15 @@ def _serve_metrics(args: argparse.Namespace, lang: str, root: Path, cfg: dict) -
     server = make_metrics_server(registry, host, port)
     bound_host, bound_port = server.server_address
     print(translate(lang, "cli.metrics.listening", host=bound_host, port=bound_port), flush=True)
+    serve_until_interrupt(server)
+
+
+def serve_until_interrupt(server) -> None:
+    """Serve until Ctrl-C, then close the listening socket without a traceback."""
     try:
         server.serve_forever()
+    except KeyboardInterrupt:
+        return
     finally:
         server.server_close()
 
