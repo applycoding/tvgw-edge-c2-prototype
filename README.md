@@ -38,7 +38,7 @@ Public repository: [github.com/applycoding/tvgw-edge-c2-prototype](https://githu
 | OASIS NIEMOpen 6.0 | XSD validation | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — see `NOTICE.md` |
 | HIT-UAV | Annotation replay | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (GitHub); see `NOTICE.md` |
 | NASA FIRMS Canada 24h CSV | Fire hotspots snapshot in `data/sample/` | NASA open data policy |
-| This repository | Code | Apache-2.0 (`LICENSE`) |
+| This repository | Code | All rights reserved; evaluation-only permission (`LICENSE`) |
 
 Pinned SHA-256 checksums are listed in `data/README.md`. Downloads use commit-pinned HIT-UAV URLs and fail on mismatch (`scripts/download_datasets.py`, `scripts/download_niem.py`).
 

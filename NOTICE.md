@@ -1,7 +1,7 @@
 # NOTICES AND ATTRIBUTIONS
 
 ## Repository code
-Copyright 2026 Arpan Bom. Licensed under Apache License 2.0.
+Copyright (c) 2026 Arpan Bom. All rights reserved. Evaluation-only permission; see `LICENSE`.
 
 ## OASIS NIEMOpen 6.0
 Project: NIEMOpen Version: 6.0; Copyright (c) OASIS Open 2025. All Rights Reserved.
